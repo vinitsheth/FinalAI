@@ -19,6 +19,7 @@ Pacman agents (in searchAgents.py).
 
 import util
 
+
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -206,6 +207,79 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    U = util.PriorityQueue()
+    rhs = {}
+    g = {}
+    INF = float('inf')
+    goalState = problem.getGoalState()
+    startState = problem.getStartState()
+    def calculateKey(s):
+        h = util.manhattanDistance(s,goalState)
+        return (min(g[s],rhs[s])+h,min(g[s],rhs[s]))
+
+    def initilize():
+        for state in problem.getAllStates():
+            rhs[state] = INF
+            g[state] = INF
+        rhs[startState] =0
+        U.push(startState,calculateKey(startState))
+
+    def updateVertx(u):
+        if(u!=startState):
+            temp = INF
+            for s,c  in problem.getSuccessors(u):
+                t1=g[s]+c
+                if temp > t1:
+                    temp = t1
+            rhs[u] = temp
+        U.remove(u)
+        if(g[u]!=rhs[u]):
+            U.push(u,calculateKey(u))
+    def computeShortestPath():
+        while (U.topKey() < calculateKey(goalState) or rhs[goalState] != g[goalState]):
+            u  =U.pop()
+            if g[u]>rhs[u]:
+                g[u] = rhs[u]
+                for s ,c in problem.getSuccessors(u):
+                    updateVertx(s)
+            else:
+                g[u] = INF
+                list = problem.getSuccessors(u)
+                list.append(u)
+                for s,c in list:
+                    updateVertx(s)
+    def createPath():
+        path = []
+        path.append(goalState)
+        S = goalState
+
+        while S != startState:
+            temp = INF
+            minState = None
+            for s , c in problem.getSuccessors(S):
+                if temp > g[s]:
+                    temp = g[s]
+                    minState =s
+            path.append(s)
+            S=minState
+
+        path.append(S)
+        return path[::-1]
+
+
+
+    initilize()
+    computeShortestPath()
+    print "#####"
+    print g[(2,1)]
+    print g[(3,1)]
+    print g[(4,1)]
+    print createPath()
+    print z
+
+
+
+
     visited = []  # to keep list of visited nodes
     notVisited = util.PriorityQueue()
     notVisited.push([(problem.getStartState(), "Start", 0)], (0,0))

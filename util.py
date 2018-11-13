@@ -188,6 +188,14 @@ class PriorityQueue:
         (_, _, item) = heapq.heappop(self.heap)
         return item
 
+    def topKey(self):
+        return self.heap[0][0]
+
+    def remove(self,p):
+        MINF = float('-inf')
+        self.update(p,MINF)
+        a = self.pop()
+
     def isEmpty(self):
         return len(self.heap) == 0
 

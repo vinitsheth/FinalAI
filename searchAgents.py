@@ -153,9 +153,10 @@ class PositionSearchProblem(search.SearchProblem):
         goal: A position in the gameState
         """
         self.walls = gameState.getWalls()
+        self.knownWalls = []
         self.startState = gameState.getPacmanPosition()
         if start != None: self.startState = start
-        self.goal = goal
+        self.goal = gameState.getFood().asList()[0]
         self.costFn = costFn
         self.visualize = visualize
         if warn and (gameState.getNumFood() != 1 or not gameState.hasFood(*goal)):
@@ -163,6 +164,17 @@ class PositionSearchProblem(search.SearchProblem):
 
         # For display purposes
         self._visited, self._visitedlist, self._expanded = {}, [], 0 # DO NOT CHANGE
+
+    def addWall(self,s):
+        self.knownWalls.append(s)
+
+    def cost(self,u,v):
+        if u in self.knownWalls or v in self.knownWalls:
+            return float('inf')
+        return 1
+
+    def getGoalState(self):
+        return self.goal
 
     def getStartState(self):
         return self.startState
@@ -191,7 +203,8 @@ class PositionSearchProblem(search.SearchProblem):
          required to get there, and 'stepCost' is the incremental
          cost of expanding to that successor
         """
-
+        """
+        print "line 183 search Agents"
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             x,y = state
@@ -209,6 +222,43 @@ class PositionSearchProblem(search.SearchProblem):
             self._visitedlist.append(state)
 
         return successors
+        """
+
+        #print state
+        x = int(state[0])
+        y= int(state[1])
+
+        l = []
+        
+        if x-1 !=0:
+            if y+1 != 19:
+                l.append(  ((x-1,y+1),self.cost(x-1,y+1)) )
+            l.append(((x-1,y),self.cost(x-1,y)))
+            if y-1 !=0:
+                l.append(((x - 1, y-1), self.cost(x-1,y-1)))
+        if y+1 != 19:
+            l.append(((x, y+1), self.cost(x,y+1)))
+        if y-1 !=0:
+            l.append(((x, y-1), self.cost(x,y-1)))
+        if x+1 != 16:
+            if y+1 != 19:
+                l.append(((x + 1, y+1), self.cost(x+1,y+1)))
+            l.append(((x + 1, y), self.cost(x+1,y)))
+            if y-1 !=0:
+                l.append(((x + 1, y-1), self.cost(x+1,y-1)))
+        ans = []
+        for i ,c in l:
+            if i not in self.knownWalls:
+                ans.append((i,c))
+        return ans
+    def getAllStates(self):
+        l =[]
+        for i in range(1,16):
+            for j in range(1,19):
+               l.append((i,j))
+
+        return l
+
 
     def getCostOfActions(self, actions):
         """
@@ -333,7 +383,7 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
-
+        print "line 326 search Agents"
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
@@ -466,6 +516,7 @@ class FoodSearchProblem:
 
     def getSuccessors(self, state):
         "Returns successor states, the actions they require, and a cost of 1."
+        print "line 467 search Agents"
         successors = []
         self._expanded += 1 # DO NOT CHANGE
         for direction in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
