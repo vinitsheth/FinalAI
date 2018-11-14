@@ -284,10 +284,12 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         path = createPath()
         print "Traversing path"
         for i in range(len(path)-1):
-            print path[i+1]
-
+            #print path[i+1]
+            print "next Element"+str(path[i+1])
             if problem.checkWall(path[i+1]):
-                print "################"
+                #print "################"
+                print "Wall Found At "+str(path[i+1])
+                print "Updating"
                 problem.addWall(path[i+1])
                 updateVertx(path[i+1])
                 #for state,c in problem.getSuccessors(path[i+1]):
@@ -301,7 +303,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 finalPath = path
                 break
 
-    print finalPath
+    #print finalPath
 
     print createPath()
 
