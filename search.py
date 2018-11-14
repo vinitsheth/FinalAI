@@ -19,7 +19,6 @@ Pacman agents (in searchAgents.py).
 
 import util
 
-
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -205,29 +204,30 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def aStarSearch(problem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
+
     U = util.PriorityQueue()
     rhs = {}
     g = {}
     INF = float('inf')
     goalState = problem.getGoalState()
     startState = problem.getStartState()
+    
     def calculateKey(s):
         h = util.manhattanDistance(s,goalState)
         return (min(g[s],rhs[s])+h,min(g[s],rhs[s]))
-
+    
     def initilize():
         for state in problem.getAllStates():
             rhs[state] = INF
             g[state] = INF
         rhs[startState] =0
         U.push(startState,calculateKey(startState))
-
+    
     def updateVertx(u):
         if(u!=startState):
             temp = INF
             for s,c  in problem.getSuccessors(u):
+                #print g[s],c
                 t1=g[s]+c
                 if temp > t1:
                     temp = t1
@@ -235,6 +235,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         U.remove(u)
         if(g[u]!=rhs[u]):
             U.push(u,calculateKey(u))
+    
     def computeShortestPath():
         while (U.topKey() < calculateKey(goalState) or rhs[goalState] != g[goalState]):
             u  =U.pop()
@@ -248,6 +249,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                 list.append(u)
                 for s,c in list:
                     updateVertx(s)
+    
     def createPath():
         path = []
         path.append(goalState)
@@ -266,23 +268,21 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         path.append(S)
         return path[::-1]
 
-
-
     initilize()
+    #print g.items()
+    #print g[(16,1)]
     computeShortestPath()
     print "#####"
-    print g[(2,1)]
-    print g[(3,1)]
-    print g[(4,1)]
+    
     print createPath()
-    print z
-
-
-
-
+    
+    #print z
+    """Search the node that has the lowest combined cost and heuristic first."""
+    "*** YOUR CODE HERE ***"
+    """
     visited = []  # to keep list of visited nodes
     notVisited = util.PriorityQueue()
-    notVisited.push([(problem.getStartState(), "Start", 0)], (0,0))
+    notVisited.push([(problem.getStartState(), "Start", 0)], 0)
 
     while not notVisited.isEmpty():
 
@@ -307,13 +307,14 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                     childPath = sPath + []
                     childNew = (child[0], child[1], child[2] + s[2])
                     childPath.append(childNew)
-                    tempval = childNew[2] + heuristic(child[0], problem)
-                    notVisited.push(childPath,(tempval,tempval) )
+                    notVisited.push(childPath, childNew[2] + + heuristic(child[0], problem))
+
     util.raiseNotDefined()
+    """
 
 
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
-astar = aStarSearch 
+astar = aStarSearch
 ucs = uniformCostSearch
