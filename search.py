@@ -239,7 +239,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             U.push(u,calculateKey(u))
     
     def computeShortestPath():
-        while (U.topKey() < calculateKey(goalState) or rhs[goalState] != g[goalState]):
+        while (rhs[goalState] != g[goalState] or U.topKey() < calculateKey(goalState)  ):
             u  =U.pop()
             if g[u]>rhs[u]:
                 g[u] = rhs[u]
@@ -402,6 +402,7 @@ def dStarSearch(problem, heuristic=nullHeuristic):
         while (U.topKey() < calculateKey(startState) or rhs[startState] != g[startState]):
             kold = U.topKey()
             u = U.pop()
+            #success = problem.getSuccessors(u)
             if kold < calculateKey(u):
                 U.push(u,calculateKey(u))
             elif g[u] > rhs[u]:

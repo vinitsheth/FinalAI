@@ -41,6 +41,7 @@ import util
 import time
 import search
 
+
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
 
@@ -152,6 +153,7 @@ class PositionSearchProblem(search.SearchProblem):
         costFn: A function from a search state (tuple) to a non-negative number
         goal: A position in the gameState
         """
+
         self.walls = gameState.getWalls().asList()
         self.knownWalls = []
         self.startState = gameState.getPacmanPosition()
@@ -159,12 +161,28 @@ class PositionSearchProblem(search.SearchProblem):
         self.goal = gameState.getFood().asList()[0]
         self.costFn = costFn
         self.visualize = visualize
+        self.getGridSize()
+        print self.walls
+        
+        
         if warn and (gameState.getNumFood() != 1 or not gameState.hasFood(*goal)):
             print 'Warning: this does not look like a regular search maze'
 
         # For display purposes
         self._visited, self._visitedlist, self._expanded = {}, [], 0 # DO NOT CHANGE
 
+    def getGridSize(self):
+        allWalls = self.walls
+        xlist =[]
+        ylist=[]
+        for x,y in allWalls:
+            xlist.append(x)
+            ylist.append(y)
+        self.minx = min(xlist)
+        self.maxx = max(xlist)
+        self.miny = min(ylist)
+        self.maxy = max(ylist)
+    
     def cost(self,u,v):
         if u in self.knownWalls or v in self.knownWalls:
             return float('inf')
@@ -216,17 +234,18 @@ class PositionSearchProblem(search.SearchProblem):
          required to get there, and 'stepCost' is the incremental
          cost of expanding to that successor
         """
+        
         x = int(state[0])
         y= int(state[1])
 
         l = []
-        if y-1 !=0:
+        if y-1 !=self.miny:
             l.append( ( (x,y-1),self.cost((x,y-1),(x,y))  ))
-        if y+1 !=16:
+        if y+1 !=self.maxy:
             l.append(  ((x,y+1),self.cost((x,y+1),(x,y))  ))
-        if x-1 !=0:
+        if x-1 !=self.minx:
             l.append(  ((x-1,y),self.cost((x-1,y),(x,y))  ) )
-        if x+1 != 19:
+        if x+1 != self.maxx:
             l.append( ( (x+1,y),self.cost((x+1,y),(x,y)))  )
         
         #return l
