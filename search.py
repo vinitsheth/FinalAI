@@ -439,7 +439,7 @@ def dStarSearch(problem, heuristic=nullHeuristic):
                 if s2 not in path:
                     tempList1.append(s2)
             for s3 in tempList1:
-                print (s3,g[s3])
+                #print (s3,g[s3])
                 if temp > g[s3]:
                     temp = g[s3]
                     minState = s3
@@ -465,14 +465,14 @@ def dStarSearch(problem, heuristic=nullHeuristic):
         for t in templ:
             print t
     
-    """
+    
     finalPath = []
     finalPath.append(startState)
     
     while startState != goalState:
         minimum = INF
         minimumState = None
-        print 
+        #print 
         for s, c in problem.getSuccessors(startState):
             temp = g[s]+c 
             if temp<minimum:
@@ -484,15 +484,17 @@ def dStarSearch(problem, heuristic=nullHeuristic):
             problem.addWall(startState)
             km += util.manhattanDistance(slast,startState)
             startState = slast
-            updateVertx(startState)
+            updateVertx(minimumState)
             computeShortestPath()
        
             
     
     """
     printg()
+
     
     while startState != goalState:
+
         minimum = INF
         minimumState = None
         #print 
@@ -518,10 +520,10 @@ def dStarSearch(problem, heuristic=nullHeuristic):
             #print startState,nextState
             finalPath.append(nextState)
             startState = nextState
-    
+    """
     #print createPath()
-    print finalPath
-    return getDirections(finalPath)
+    #print finalPath
+    return getDirections(createPath())
     
 
 
