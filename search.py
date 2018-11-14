@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+from game import Directions
 
 class SearchProblem:
     """
@@ -306,6 +307,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     #print finalPath
 
     print createPath()
+    return getDirections(createPath())
 
     #print z
     """Search the node that has the lowest combined cost and heuristic first."""
@@ -343,29 +345,48 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     util.raiseNotDefined()
     """
 
+def getDirections(path):
+    ans = []
+    x,y = path[0]
+    for i in range(1,len(path)):
+        xi,yi = path[i]
+        if x > xi:
+            ans.append(Directions.WEST)
+        if x<xi:
+            ans.append(Directions.EAST)
+        if y<yi:
+            ans.append(Directions.NORTH)
+        if y>yi:
+            ans.append(Directions.SOUTH)
+        x = xi
+        y = yi
+    return ans
+
+
 
 def dStarSearch(problem, heuristic=nullHeuristic):
     U = util.PriorityQueue()
     rhs = {}
     g = {}
+    km = 0
     INF = float('inf')
     goalState = problem.getGoalState()
     startState = problem.getStartState()
     finalPath = []
 
     def calculateKey(s):
-        h = util.manhattanDistance(s, goalState)
-        return (min(g[s], rhs[s]) + h, min(g[s], rhs[s]))
+        h = util.manhattanDistance(s, startState)
+        return (min(g[s], rhs[s]) + h+ km, min(g[s], rhs[s]))
 
     def initilize():
         for state in problem.getAllStates():
             rhs[state] = INF
             g[state] = INF
-        rhs[startState] = 0
-        U.push(startState, calculateKey(startState))
+        rhs[goalState] = 0
+        U.push(goalState, calculateKey(goalState))
 
     def updateVertx(u):
-        if (u != startState):
+        if (u != goalState):
             temp = INF
             for s, c in problem.getSuccessors(u):
                 # print g[s],c
@@ -378,14 +399,19 @@ def dStarSearch(problem, heuristic=nullHeuristic):
             U.push(u, calculateKey(u))
 
     def computeShortestPath():
-        while (U.topKey() < calculateKey(goalState) or rhs[goalState] != g[goalState]):
+        while (U.topKey() < calculateKey(startState) or rhs[startState] != g[startState]):
+            kold = U.topKey()
             u = U.pop()
-            if g[u] > rhs[u]:
+            if kold < calculateKey(u):
+                U.push(u,calculateKey(u))
+            elif g[u] > rhs[u]:
                 g[u] = rhs[u]
+                #print ("a",u,g[u])
                 for s, c in problem.getSuccessors(u):
                     updateVertx(s)
             else:
                 g[u] = INF
+                #print ("b",u,g[u])
                 list = problem.getSuccessors(u)
 
                 list.append((u, 1))
@@ -395,57 +421,116 @@ def dStarSearch(problem, heuristic=nullHeuristic):
     def createPath():
         path = []
 
-        S = goalState
+        S = problem.getStartState()
 
-        while S != startState:
+        while S != goalState:
             temp = INF
             minState = None
             path.append(S)
-            for s, c in problem.getSuccessors(S):
-                if temp > g[s]:
-                    temp = g[s]
-                    minState = s
-
+            #print S
+            #print problem.getSuccessors(S)
+            #print path
+            tempList = []
+            for s1, c in problem.getSuccessors(S):
+                #print "in 1"
+                tempList.append(s1)
+            tempList1 = []
+            for s2 in tempList:
+                if s2 not in path:
+                    tempList1.append(s2)
+            for s3 in tempList1:
+                print (s3,g[s3])
+                if temp > g[s3]:
+                    temp = g[s3]
+                    minState = s3
             S = minState
-
         path.append(S)
-        return path[::-1]
-
+        return path
+    
+    sstart = startState
+    slast = startState
     initilize()
+    computeShortestPath()
+    #print problem.getSuccessors(startState)
+    #print createPath()
+    #print zx
+    def printg():
+        templ = []
+        for key,val in g.items():
+            if val !=INF:
+                templ.append((key,val))
+        def getKey(a):
+            return a[1]
+        templ = sorted(templ,key=getKey)
+        for t in templ:
+            print t
+    
+    """
+    finalPath = []
+    finalPath.append(startState)
+    
+    while startState != goalState:
+        minimum = INF
+        minimumState = None
+        print 
+        for s, c in problem.getSuccessors(startState):
+            temp = g[s]+c 
+            if temp<minimum:
+                minimum = temp
+                minimumState = s
+        startState = minimumState
+        if problem.checkWall(startState):
+            print "wall found at"+str(startState)
+            problem.addWall(startState)
+            km += util.manhattanDistance(slast,startState)
+            startState = slast
+            updateVertx(startState)
+            computeShortestPath()
+       
+            
+    
+    """
+    printg()
+    
+    while startState != goalState:
+        minimum = INF
+        minimumState = None
+        #print 
+        for s, c in problem.getSuccessors(startState):
+            temp = g[s]+c 
+            if temp<minimum:
+                minimum = temp
+                minimumState = s
+        nextState = minimumState
+        if problem.checkWall(nextState):
+            print "wall found at"+str(nextState)
+            problem.addWall(nextState)
+            km += util.manhattanDistance(slast,nextState)
+            slast = startState
+            updateVertx(nextState)
+            #for st , ct in problem.getSuccessors(nextState):
+            #   updateVertx(st)
+            
+            computeShortestPath()
+            #printg()
+            #print g[(5,1)]
+        else:
+            #print startState,nextState
+            finalPath.append(nextState)
+            startState = nextState
+    
+    #print createPath()
+    print finalPath
+    return getDirections(finalPath)
+    
+
+
     # print g.items()
     # print g[(16,1)]
 
 
 
 
-
-    while len(finalPath) == 0 or finalPath[-1] != goalState:
-        computeShortestPath()
-        path = createPath()
-        print "Traversing path"
-        for i in range(len(path) - 1):
-            # print path[i+1]
-            print "next Element" + str(path[i + 1])
-            if problem.checkWall(path[i + 1]):
-                # print "################"
-                print "Wall Found At " + str(path[i + 1])
-                print "Updating"
-                problem.addWall(path[i + 1])
-                updateVertx(path[i + 1])
-                # for state,c in problem.getSuccessors(path[i+1]):
-                #  updateVertx(state)
-                # path = createPath()
-                # for p in path:
-                #    print g[p], rhs[p]
-
-                break
-            elif path[i + 1] == goalState:
-                finalPath = path
-                break
-
-    # print finalPath
-
-    print createPath()
 
 
 

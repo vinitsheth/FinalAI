@@ -220,14 +220,15 @@ class PositionSearchProblem(search.SearchProblem):
         y= int(state[1])
 
         l = []
+        if y-1 !=0:
+            l.append( ( (x,y-1),self.cost((x,y-1),(x,y))  ))
+        if y+1 !=16:
+            l.append(  ((x,y+1),self.cost((x,y+1),(x,y))  ))
         if x-1 !=0:
             l.append(  ((x-1,y),self.cost((x-1,y),(x,y))  ) )
         if x+1 != 19:
             l.append( ( (x+1,y),self.cost((x+1,y),(x,y)))  )
-        if y-1 !=0:
-            l.append( ( (x,y-1),self.cost((x,y-1),(x,y))  ))
-        if y+1 !=0:
-            l.append(  ((x,y+1),self.cost((x,y+1),(x,y))  ))
+        
         #return l
         """
         successors = []
