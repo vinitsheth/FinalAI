@@ -211,6 +211,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     INF = float('inf')
     goalState = problem.getGoalState()
     startState = problem.getStartState()
+    finalPath = []
     
     def calculateKey(s):
         h = util.manhattanDistance(s,goalState)
@@ -246,23 +247,25 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             else:
                 g[u] = INF
                 list = problem.getSuccessors(u)
-                list.append(u)
+
+                list.append((u,1))
                 for s,c in list:
                     updateVertx(s)
     
     def createPath():
         path = []
-        path.append(goalState)
+
         S = goalState
 
         while S != startState:
             temp = INF
             minState = None
+            path.append(S)
             for s , c in problem.getSuccessors(S):
                 if temp > g[s]:
                     temp = g[s]
                     minState =s
-            path.append(s)
+
             S=minState
 
         path.append(S)
@@ -271,11 +274,37 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     initilize()
     #print g.items()
     #print g[(16,1)]
-    computeShortestPath()
-    print "#####"
-    
+
+
+
+
+
+    while len(finalPath) == 0 or finalPath[-1] != goalState:
+        computeShortestPath()
+        path = createPath()
+        print "Traversing path"
+        for i in range(len(path)-1):
+            print path[i+1]
+
+            if problem.checkWall(path[i+1]):
+                print "################"
+                problem.addWall(path[i+1])
+                updateVertx(path[i+1])
+                #for state,c in problem.getSuccessors(path[i+1]):
+                #  updateVertx(state)
+                #path = createPath()
+                #for p in path:
+                #    print g[p], rhs[p]
+
+                break
+            elif path[i+1] == goalState:
+                finalPath = path
+                break
+
+    print finalPath
+
     print createPath()
-    
+
     #print z
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"

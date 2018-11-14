@@ -152,7 +152,7 @@ class PositionSearchProblem(search.SearchProblem):
         costFn: A function from a search state (tuple) to a non-negative number
         goal: A position in the gameState
         """
-        self.walls = gameState.getWalls()
+        self.walls = gameState.getWalls().asList()
         self.knownWalls = []
         self.startState = gameState.getPacmanPosition()
         if start != None: self.startState = start
@@ -172,7 +172,15 @@ class PositionSearchProblem(search.SearchProblem):
 
     def getGoalState(self):
         return self.goal
-    
+
+    def checkWall(self,s):
+        if s in self.walls:
+            return True
+        return False
+
+    def addWall(self,s):
+        self.knownWalls.append(s)
+
     def getAllStates(self):
         l =[]
         for i in range(1,19):
@@ -213,13 +221,13 @@ class PositionSearchProblem(search.SearchProblem):
 
         l = []
         if x-1 !=0:
-            l.append(  ((x-1,y),self.cost(x-1,y) ) )
+            l.append(  ((x-1,y),self.cost((x-1,y),(x,y))  ) )
         if x+1 != 19:
-            l.append( ( (x+1,y),self.cost(x+1,y))  )
+            l.append( ( (x+1,y),self.cost((x+1,y),(x,y)))  )
         if y-1 !=0:
-            l.append( ( (x,y-1),self.cost(x,y-1)  ))
+            l.append( ( (x,y-1),self.cost((x,y-1),(x,y))  ))
         if y+1 !=0:
-            l.append(  ((x,y+1),self.cost(x,y+1)  ))
+            l.append(  ((x,y+1),self.cost((x,y+1),(x,y))  ))
         #return l
         """
         successors = []
