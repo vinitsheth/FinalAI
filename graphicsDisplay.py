@@ -176,6 +176,10 @@ class PacmanGraphics:
 
         # Information
         self.previousState = state
+    # def newin(self,wallmat):
+    #     self.distributionImages = None  # Initialized lazily
+    #     self.drawStaticObjects(state)
+    #     self.drawAgentObjects(state)
 
     def startGraphics(self, state):
         self.layout = state.layout
@@ -203,7 +207,7 @@ class PacmanGraphics:
 
     def drawStaticObjects(self, state):
         layout = self.layout
-        self.drawWalls(layout.walls)
+        #self.drawWalls(layout.walls)
         self.food = self.drawFood(layout.food)
         self.capsules = self.drawCapsules(layout.capsules)
         refresh()
@@ -236,7 +240,7 @@ class PacmanGraphics:
     def update(self, newState):
         agentIndex = newState._agentMoved
         agentState = newState.agentStates[agentIndex]
-
+        
         if self.agentImages[agentIndex][0].isPacman != agentState.isPacman: self.swapImages(agentIndex, agentState)
         prevState, prevImage = self.agentImages[agentIndex]
         if agentState.isPacman:
@@ -513,6 +517,7 @@ class PacmanGraphics:
                         circle(add(screen2, (self.gridSize*(-2)*WALL_RADIUS, self.gridSize*(2)*WALL_RADIUS)), WALL_RADIUS * self.gridSize-1, wallColor, wallColor, (0,91), 'arc')
                         line(add(screen, (self.gridSize*(-2)*WALL_RADIUS+1, self.gridSize*(1)*WALL_RADIUS)), add(screen, (self.gridSize*(-0.5), self.gridSize*(1)*WALL_RADIUS)), wallColor)
                         line(add(screen, (self.gridSize*(-1)*WALL_RADIUS, self.gridSize*(2)*WALL_RADIUS-1)), add(screen, (self.gridSize*(-1)*WALL_RADIUS, self.gridSize*(0.5))), wallColor)
+        #refresh()
 
     def isWall(self, x, y, walls):
         if x < 0 or y < 0:
@@ -577,6 +582,34 @@ class PacmanGraphics:
                      color = cellColor,
                      filled = 1, behind=2)
             self.expandedCells.append(block)
+            if self.frameTime < 0:
+                refresh()
+
+    def drawNewWalls1(self, wallmatrix):
+        self.drawWalls(wallmatrix)
+        if self.frameTime < 0:
+                refresh()
+    
+    def drawNewWalls(self, cells):
+        """
+        Draws an overlay of expanded grid positions for search agents
+        """
+        wallColor = WALL_COLOR
+        n = float(len(cells))
+        baseColor = [1.0, 1.0, 0.0]
+        #self.clearExpandedCells()
+        self.expandedwalls = []
+        for k, cell in enumerate(cells):
+            screen = self.to_screen( cell)
+            cellColor = formatColor(*[(n-k) * c * .5 / n + .25 for c in baseColor])
+            
+            block = square(screen,
+                         0.5 * self.gridSize,
+                         color = cellColor,
+                         filled = 0, behind=3)
+            #block = circle(screen, WALL_RADIUS * self.gridSize, wallColor, wallColor, (180,271), 'arc')
+            #block = line(add(screen, (0, self.gridSize*(1)*WALL_RADIUS)), add(screen, (self.gridSize*(-0.5)-1, self.gridSize*(1)*WALL_RADIUS)), wallColor)
+            self.expandedwalls.append(block)
             if self.frameTime < 0:
                 refresh()
 

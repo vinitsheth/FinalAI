@@ -19,6 +19,7 @@ Pacman agents (in searchAgents.py).
 
 import util
 from game import Directions
+from graphicsDisplay import PacmanGraphics
 
 class SearchProblem:
     """
@@ -279,20 +280,34 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
 
 
-
-    while len(finalPath) == 0 or finalPath[-1] != goalState:
+    fpath =[]
+    Flag = True
+    
+    while startState != goalState and Flag:
+        initilize()
         computeShortestPath()
         path = createPath()
+        #problem.printPath(createPath())
+        #fpath.append(startState)
         print "Traversing path"
+        print goalState
+        if(len(path)==1 and path[0]==goalState): break
         for i in range(len(path)-1):
+            fpath.append(path[i])
+            finalPath.append(path[i])
             #print path[i+1]
             print "next Element"+str(path[i+1])
             if problem.checkWall(path[i+1]):
                 #print "################"
+                problem.printPath(fpath)
+                fpath = []
                 print "Wall Found At "+str(path[i+1])
                 print "Updating"
                 problem.addWall(path[i+1])
                 updateVertx(path[i+1])
+                startState = path[i]
+                #U.push(startState,calculateKey(startState))
+                #problem.movePacman(startState)
                 #for state,c in problem.getSuccessors(path[i+1]):
                 #  updateVertx(state)
                 #path = createPath()
@@ -301,13 +316,22 @@ def aStarSearch(problem, heuristic=nullHeuristic):
 
                 break
             elif path[i+1] == goalState:
-                finalPath = path
+                Flag = False
+                #finalPath = path
                 break
-
+            #else:
+                #startState = path[i]
+    
+        
+            #startState = path[i+1]
+    
+    finalPath.append(goalState)
+    #problem.printPath(finalPath)
     #print finalPath
-
-    print createPath()
-    return getDirections(createPath())
+    
+    #print createPath()
+    problem.clearlast()
+    return getDirections(finalPath)
 
     #print z
     """Search the node that has the lowest combined cost and heuristic first."""
@@ -373,21 +397,24 @@ def dStarSearch(problem, heuristic=nullHeuristic):
     goalState = problem.getGoalState()
     startState = problem.getStartState()
     finalPath = []
-
+    def km0():
+        km=0
     def calculateKey(s):
         h = util.manhattanDistance(s, startState)
-        return (min(g[s], rhs[s]) + h+ km, min(g[s], rhs[s]))
+        ans = (min(g[s], rhs[s]) + h+ km, min(g[s], rhs[s]))
+        km0()
+        return ans
 
     def initilize():
         for state in problem.getAllStates():
-            rhs[state] = INF
-            g[state] = INF
+            rhs[state] = float('inf')
+            g[state] = float('inf')
         rhs[goalState] = 0
         U.push(goalState, calculateKey(goalState))
 
     def updateVertx(u):
         if (u != goalState):
-            temp = INF
+            temp = float('inf')
             for s, c in problem.getSuccessors(u):
                 # print g[s],c
                 t1 = g[s] + c
@@ -399,7 +426,7 @@ def dStarSearch(problem, heuristic=nullHeuristic):
             U.push(u, calculateKey(u))
 
     def computeShortestPath():
-        while (U.topKey() < calculateKey(startState) or rhs[startState] != g[startState]):
+        while ( rhs[startState] != g[startState] or U.topKey() < calculateKey(startState)):
             kold = U.topKey()
             u = U.pop()
             #success = problem.getSuccessors(u)
@@ -411,7 +438,7 @@ def dStarSearch(problem, heuristic=nullHeuristic):
                 for s, c in problem.getSuccessors(u):
                     updateVertx(s)
             else:
-                g[u] = INF
+                g[u] = float('inf')
                 #print ("b",u,g[u])
                 list = problem.getSuccessors(u)
 
@@ -468,26 +495,42 @@ def dStarSearch(problem, heuristic=nullHeuristic):
     
     
     finalPath = []
-    finalPath.append(startState)
+    fpath = []
+    #finalPath.append(startState)
     
     while startState != goalState:
-        minimum = INF
+        minimum = float('inf')
         minimumState = None
         #print 
+        #km=0
+        #problem.printPath(finalPath)
+        fpath.append(startState)
         for s, c in problem.getSuccessors(startState):
             temp = g[s]+c 
             if temp<minimum:
                 minimum = temp
                 minimumState = s
-        startState = minimumState
-        if problem.checkWall(startState):
-            print "wall found at"+str(startState)
-            problem.addWall(startState)
+        #startState = minimumState
+        if problem.checkWall(minimumState):
+            print "wall found at"+str(minimumState)
+            problem.addWall(minimumState)
             km += util.manhattanDistance(slast,startState)
-            startState = slast
+            #km = float('inf')
+            slast = startState
             updateVertx(minimumState)
+            #km=0
+            problem.printPath(fpath)
+            fpath=[]
             computeShortestPath()
-       
+        else:
+            finalPath.append(startState)
+            
+            startState = minimumState
+            fpath.append(startState)
+            #problem.printPath(finalPath)
+    finalPath.append(goalState)
+    problem.clearlast()
+    #problem.printPath(finalPath)   
             
     
     """
@@ -524,7 +567,7 @@ def dStarSearch(problem, heuristic=nullHeuristic):
     """
     #print createPath()
     #print finalPath
-    return getDirections(createPath())
+    return getDirections(finalPath)
     
 
 

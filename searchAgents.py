@@ -114,8 +114,8 @@ class SearchAgent(Agent):
         starttime = time.time()
         problem = self.searchType(state) # Makes a new search problem
         self.actions  = self.searchFunction(problem) # Find a path
-        totalCost = problem.getCostOfActions(self.actions)
-        print('Path found with total cost of %d in %.1f seconds' % (totalCost, time.time() - starttime))
+        #totalCost = problem.getCostOfActions(self.actions)
+        #print('Path found with total cost of %d in %.1f seconds' % (totalCost, time.time() - starttime))
         if '_expanded' in dir(problem): print('Search nodes expanded: %d' % problem._expanded)
 
     def getAction(self, state):
@@ -153,18 +153,26 @@ class PositionSearchProblem(search.SearchProblem):
         costFn: A function from a search state (tuple) to a non-negative number
         goal: A position in the gameState
         """
-
+        #self.wallMatrix = gameState.data.layout.walls
         self.walls = gameState.getWalls().asList()
         self.knownWalls = []
+        self.state = gameState
         self.startState = gameState.getPacmanPosition()
         if start != None: self.startState = start
         self.goal = gameState.getFood().asList()[0]
         self.costFn = costFn
         self.visualize = visualize
         self.getGridSize()
-        print self.walls
-        
-        
+        print self.minx
+        print self.maxx
+        print self.miny
+        print self.maxy
+        #print self.walls
+        # for i in range(1,self.maxx):
+        #     for j in range(1,self.maxy):
+        #         self.state.data.layout.walls[i][j] = 'F'
+        # print self.state.data.layout.walls
+        # self.drawWalls()
         if warn and (gameState.getNumFood() != 1 or not gameState.hasFood(*goal)):
             print 'Warning: this does not look like a regular search maze'
 
@@ -198,17 +206,43 @@ class PositionSearchProblem(search.SearchProblem):
 
     def addWall(self,s):
         self.knownWalls.append(s)
+        #self.state.data.layout.walls[s[0]][s[1]] = 'T'
+        # print self.state.data.layout.walls
+        self.drawWalls()
+    
+    
 
     def getAllStates(self):
         l =[]
-        for i in range(1,19):
-            for j in range(1,16):
+        for i in range(1,self.maxx):
+            for j in range(1,self.maxy):
                l.append((i,j))
-
+               #self.wallMatrix[i][j] = 'F'
+        #print self.wallMatrix
         return l
     
     def getStartState(self):
         return self.startState
+    
+    def drawWalls(self):
+        import __main__
+        #__main__._display.drawNewWalls(self.knownWalls)
+        __main__._display.drawNewWalls(self.knownWalls)
+
+    def printPath(self,path):
+        import __main__
+        __main__._display.drawExpandedCells(path)
+    
+    def movePacman(self,pos):
+        self.state.pos = pos
+        import __main__
+        #def update(self, newState):
+        __main__._display.drawPacman(self.state,1)
+
+    def clearlast(self):
+        import __main__
+            #def update(self, newState):
+        __main__._display.clearExpandedCells()
 
     def isGoalState(self, state):
         isGoal = state == self.goal
@@ -216,11 +250,15 @@ class PositionSearchProblem(search.SearchProblem):
         # For display purposes only
         if isGoal and self.visualize:
             self._visitedlist.append(state)
+            #print "#############$$$$$$$$$$$$$$$$$$$$"
+            #print self._visitedlist
+            
+            """
             import __main__
             if '_display' in dir(__main__):
                 if 'drawExpandedCells' in dir(__main__._display): #@UndefinedVariable
                     __main__._display.drawExpandedCells(self._visitedlist) #@UndefinedVariable
-
+            """
         return isGoal
 
     def getSuccessors(self, state):
