@@ -206,6 +206,10 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def aStarSearch(problem, heuristic=nullHeuristic):
+    nodes = []
+    problem._expanded
+
+    
 
     U = util.PriorityQueue()
     rhs = {}
@@ -287,6 +291,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         initilize()
         computeShortestPath()
         path = createPath()
+        nodes.append(problem._expanded)
         #problem.printPath(createPath())
         #fpath.append(startState)
         print "Traversing path"
@@ -329,6 +334,13 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     #problem.printPath(finalPath)
     #print finalPath
     
+    # import pickle
+    # path1 = 'Plots/size2020MazelpastarExpanded.pickle'
+    # fil1 = open(path1,'wb')
+    # pickle.dump(nodes,fil1)
+    # fil1.close()
+    
+    print "LOADED"
     #print createPath()
     problem.clearlast()
     return getDirections(finalPath)
@@ -389,6 +401,7 @@ def getDirections(path):
 
 
 def dStarSearch(problem, heuristic=nullHeuristic):
+    nodes = []
     U = util.PriorityQueue()
     rhs = {}
     g = {}
@@ -497,13 +510,14 @@ def dStarSearch(problem, heuristic=nullHeuristic):
     finalPath = []
     fpath = []
     #finalPath.append(startState)
-    
+    nodes.append(problem._expanded)
     while startState != goalState:
         minimum = float('inf')
         minimumState = None
         #print 
         #km=0
         #problem.printPath(finalPath)
+        
         fpath.append(startState)
         for s, c in problem.getSuccessors(startState):
             temp = g[s]+c 
@@ -519,15 +533,22 @@ def dStarSearch(problem, heuristic=nullHeuristic):
             slast = startState
             updateVertx(minimumState)
             #km=0
-            problem.printPath(fpath)
+            #problem.printPath(fpath)
             fpath=[]
             computeShortestPath()
+            nodes.append(problem._expanded)
         else:
             finalPath.append(startState)
             
             startState = minimumState
             fpath.append(startState)
             #problem.printPath(finalPath)
+    
+    # import pickle
+    # path1 = 'Plots/size2020MazedstarExpanded.pickle'
+    # fil1 = open(path1,'wb')
+    # pickle.dump(nodes,fil1)
+    # fil1.close()
     finalPath.append(goalState)
     problem.clearlast()
     #problem.printPath(finalPath)   
@@ -575,8 +596,99 @@ def dStarSearch(problem, heuristic=nullHeuristic):
     # print g[(16,1)]
 
 
+def astarPath (problem, startState , goalState , heuristic=nullHeuristic):
+    visited = []  # to keep list of visited nodes
+    notVisited = util.PriorityQueue()
+    notVisited.push([(startState, "Start", 0)], 0)
+    while not notVisited.isEmpty():
+
+        sPath = notVisited.pop()
+        # print "visiting ", sPath
+        # print "Spath type", type(sPath)
+        s = sPath[-1]
+        # print "visiting ", s
+
+        #if problem.isGoalState(s[0]):
+        if s[0] == goalState:   
+            # print "In goal Check for ",s
+            ansPath = []
+            for p in sPath:
+                ansPath.append(p[0])
+            return ansPath
+
+        if s[0] not in visited:
+            visited.append(s[0])
+
+            for child in problem.getSuccessors(s[0]):
+                if child not in visited or notVisited:
+                    childPath = sPath + []
+                    childNew = (child[0], 'dir', child[1] + s[2])
+                    childPath.append(childNew)
+                    #print childNew[0]
+                    #print goalState
+                    notVisited.push(childPath, childNew[2]  + util.manhattanDistance(childNew[0],goalState))
 
 
+def aStar(problem, heuristic=nullHeuristic):
+    nodes = []
+    goalState = problem.getGoalState()
+    startState = problem.getStartState()
+    Flag = True
+    fpath = []
+    finalPath = []
+    
+    while startState != goalState and Flag:
+        
+        
+        path = astarPath(problem,startState,goalState)
+        #if len(path) == 0:break
+        nodes.append(problem._expanded)
+        #problem.printPath(createPath())
+        #fpath.append(startState)
+        print "Traversing path"
+        print path
+        #print goalState
+        if(len(path)==1 and path[0]==goalState): break
+        for i in range(len(path)-1):
+            fpath.append(path[i])
+            finalPath.append(path[i])
+            #print path[i+1]
+            print "next Element"+str(path[i+1])
+            if problem.checkWall(path[i+1]):
+                #print "################"
+                problem.printPath(fpath)
+                fpath = []
+                print "Wall Found At "+str(path[i+1])
+                print "Updating"
+                problem.addWall(path[i+1])
+                startState = path[i]
+                #U.push(startState,calculateKey(startState))
+                #problem.movePacman(startState)
+                #for state,c in problem.getSuccessors(path[i+1]):
+                #  updateVertx(state)
+                #path = createPath()
+                #for p in path:
+                #    print g[p], rhs[p]
+
+                break
+            elif path[i+1] == goalState:
+                Flag = False
+                #finalPath = path
+                break
+            #else:
+                #startState = path[i]
+    
+        
+            #startState = path[i+1]
+    # import pickle
+    # path1 = 'Plots/size2020MazeastarExpanded.pickle'
+    # fil1 = open(path1,'wb')
+    # pickle.dump(nodes,fil1)
+    # fil1.close()
+    finalPath.append(goalState)
+    problem.clearlast()
+    finalPath.append(goalState)
+    return getDirections(finalPath)
 
 
 
@@ -584,5 +696,6 @@ def dStarSearch(problem, heuristic=nullHeuristic):
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
+nastar = aStar
 ucs = uniformCostSearch
 dstar = dStarSearch
