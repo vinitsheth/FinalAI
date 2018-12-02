@@ -208,7 +208,7 @@ class PositionSearchProblem(search.SearchProblem):
         self.knownWalls.append(s)
         #self.state.data.layout.walls[s[0]][s[1]] = 'T'
         # print self.state.data.layout.walls
-        #self.drawWalls()
+        self.drawWalls()
     
     
 

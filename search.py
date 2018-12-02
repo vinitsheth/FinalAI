@@ -533,7 +533,7 @@ def dStarSearch(problem, heuristic=nullHeuristic):
             slast = startState
             updateVertx(minimumState)
             #km=0
-            #problem.printPath(fpath)
+            problem.printPath(fpath)
             fpath=[]
             computeShortestPath()
             nodes.append(problem._expanded)
@@ -642,6 +642,7 @@ def aStar(problem, heuristic=nullHeuristic):
         
         path = astarPath(problem,startState,goalState)
         #if len(path) == 0:break
+        problem.printPath(path)
         nodes.append(problem._expanded)
         #problem.printPath(createPath())
         #fpath.append(startState)
@@ -695,7 +696,7 @@ def aStar(problem, heuristic=nullHeuristic):
 # Abbreviations
 bfs = breadthFirstSearch
 dfs = depthFirstSearch
-astar = aStarSearch
-nastar = aStar
+astar = aStar
+lpastar = aStarSearch
 ucs = uniformCostSearch
 dstar = dStarSearch
